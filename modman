@@ -1,5 +1,4 @@
 magento/app/code/local/Kompassi/*                           app/code/local/Kompassi/
-magento/app/design/adminhtml/default/default/template/*     app/design/adminhtml/default/default/template/
 magento/app/design/frontend/default/default/layout/*        app/design/frontend/default/default/layout/
 magento/app/etc/modules/*                                   app/etc/modules/
 magento/app/locale/en_US/*                                  app/locale/en_US/
