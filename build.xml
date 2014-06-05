@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="PHP_General" default="build">
+    <property name="path.src" value="./src" />
+    <property name="name.project" value="" />
+
+    <property file="build.properties" />
+
+    <!-- ============================================  -->
+    <!-- Target: clean                                 -->
+    <!-- ============================================  -->
+    <target name="clean">
+        <echo msg="Cleaning build directories" />
+        <delete dir="./build/docs" />
+        <delete dir="./build/code-browser" />
+        <delete dir="./build/coverage" />
+        <delete dir="./build/logs" />
+        <delete dir="./build/pdepend" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: prepare-dirs                        -->
+    <!-- ============================================  -->
+    <target name="prepare" depends="clean">
+        <echo msg="Preparing build directories" />
+        <mkdir dir="./build" />
+        <mkdir dir="./build/docs" />
+        <mkdir dir="./build/code-browser" />
+        <mkdir dir="./build/coverage" />
+        <mkdir dir="./build/logs" />
+        <mkdir dir="./build/pdepend" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phplint                               -->
+    <!-- ============================================  -->
+    <target name="phplint">
+        <phplint haltonfailure="true">
+            <fileset dir="${path.src}">
+                <include name="**/*.php" />
+            </fileset>
+        </phplint>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phploc                                -->
+    <!-- ============================================  -->
+    <target name="phploc" depends="prepare" description="Measure project size using PHPLOC">
+        <exec executable="phploc">
+            <arg value="--log-csv" />
+            <arg value="./build/logs/phploc.csv" />
+            <arg path="${path.src}" />
+        </exec>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: pdepend                               -->
+    <!-- ============================================  -->
+    <target name="pdepend" depends="prepare" description="Calculate software metrics using PHP_Depend">
+        <phpdepend file="${path.src}">
+            <logger type="jdepend-xml" outfile="./build/logs/jdepend.xml"/>
+            <logger type="jdepend-chart" outfile="./build/logs/jdepend_dependencies.svg"/>
+            <logger type="overview-pyramid" outfile="./build/logs/jdepend_overview-pyramid.svg"/>
+        </phpdepend>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phpmd                                 -->
+    <!-- ============================================  -->
+    <target name="phpmd" depends="prepare" description="Perform project mess detection
+            using PHPMD and print human readable output. Intended for usage on the command line before committing.">
+        <phpmd
+                rulesets="./phpmd_ruleset.xml">
+            <fileset dir="${path.src}">
+                <include name="**/*.php"/>
+                <exclude name="**/Test/**"/>
+            </fileset>
+            <formatter type="xml" outfile="./build/logs/phpmd.xml"/>
+        </phpmd>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phpcs                                 -->
+    <!-- ============================================  -->
+    <target name="phpcs" depends="prepare" description="Find coding standard violations using PHP_CodeSniffer and print
+            human readable output. Intended for usage on the command line before committing.">
+        <phpcodesniffer
+                standard="./phpcs_ruleset.xml"
+                showSniffs="true">
+            <fileset dir="${path.src}">
+                <include name="**/*.php"/>
+                <exclude name="**/Test/**"/>
+            </fileset>
+            <formatter type="checkstyle" outfile="./build/logs/checkstyle.xml"/>
+            <formatter type="default" useFile="false"/>
+        </phpcodesniffer>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phpcpd                                -->
+    <!-- ============================================  -->
+    <target name="phpcpd" depends="prepare" description="Find duplicate code using PHPCPD">
+        <phpcpd>
+            <fileset dir="${path.src}">
+                <include name="**/*.php"/>
+                <exclude name="**/Test/**"/>
+            </fileset>
+            <formatter type="pmd" outfile="./build/logs/pmd-cpd.xml" />
+            <formatter type="default" useFile="false"/>
+        </phpcpd>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phpdoc2                               -->
+    <!-- ============================================  -->
+    <target name="phpdoc2" depends="prepare" description="Generate API documentation">
+        <phpdoc2 destdir="./build/docs" template="responsive">
+            <fileset dir="${path.src}">
+                <include name="**/*.php" />
+            </fileset>
+        </phpdoc2>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: phpcb                                 -->
+    <!-- ============================================  -->
+    <target name="phpcb" depends="prepare" description="Aggregate tool output with PHP_CodeBrowser">
+        <exec executable="phpcb">
+            <arg value="--log" />
+            <arg path="./build/logs" />
+            <arg value="--source" />
+            <arg path="${path.src}" />
+            <arg value="--output" />
+            <arg path="./build/code-browser" />
+        </exec>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: build                                 -->
+    <!-- ============================================  -->
+    <target name="build" depends="prepare, phplint, phploc, pdepend, phpmd, phpcs, phpcpd, phpdoc2, phpcb">
+
+    </target>
+
+</project>
