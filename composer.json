@@ -1,0 +1,19 @@
+{
+    "name": "paveq/Checkout-Finland-Magento-module",
+    "type": "magento-module",
+    "description": "Kompassi_CheckoutFinland",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Matti S"
+        }
+    ],
+    "require": {
+        "vaimo/magento": "*",
+        "magento-hackathon/magento-composer-installer": "*" 
+        
+    },
+    "extra": {
+        "vaimo-module-category": "Payment"
+    }
+}
